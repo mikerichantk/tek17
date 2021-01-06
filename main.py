@@ -123,6 +123,14 @@ class MoveButtons(QtWidgets.QWidget):
     def __init__(self):
         super(QtWidgets.QWidget, self).__init__()
 
+
+
+# Class to handle the button pushes
+class ButtonPushed(QtWidgets.QPushButton):
+
+    def __init__(self):
+        super(QtWidgets.QWidget, self).__init__()
+
         # layout container for the buttons
         move_button_container = QtWidgets.QGridLayout()
         self.setLayout(move_button_container)

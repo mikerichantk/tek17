@@ -3,10 +3,19 @@ __copyright__ = "Copyright 2020, Tektronix Inc."
 __credits__ = ["Addison Raak", "Michael Antkiewicz", "Ka'ulu Ng", "Nicholas Baldwin"]
 
 import sys
+import os
+import random
+import matplotlib
+matplotlib.use('Qt5Agg')
 
-from PyQt5 import QtWidgets
-from PyQt5 import QtCore
+from graph_widget import DrawGraph
+
+from numpy import arange, sin, pi
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 
 
 # Class for the main widget of the program, which will have the tab manager
@@ -45,6 +54,7 @@ class OverlayWidget(QtWidgets.QWidget):
         # layout container for the buttons
         layout_container = QtWidgets.QGridLayout()
         self.setLayout(layout_container)
+
         # create buttons to interact
         self.move_buttons = (QtWidgets.QPushButton("UP"),
                              QtWidgets.QPushButton("DOWN"),
@@ -77,6 +87,13 @@ class OverlayWidget(QtWidgets.QWidget):
 
         self.zoom_buttons[0].clicked.connect(self.click_zoom_in)
         self.zoom_buttons[1].clicked.connect(self.click_zoom_out)
+
+        # add graph widget
+        self.graph_figure = plt.figure(1, figsize=(5, 10))
+        self.graph_canvas = FigureCanvas(self.graph_figure)
+        self.graph_widget = DrawGraph(self.graph_figure, self.graph_canvas)
+
+        layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
 
     def click_up(self):
         print("Up button was pressed.")

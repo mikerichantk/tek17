@@ -1,5 +1,5 @@
 __author__ = "Addison Raak, Michael Antkiewicz, Ka'ulu Ng, Nicholas Baldwin"
-__copyright__ = "Copyright 2021, Tektronix Inc."
+__copyright__ = "Copyright 2017-19, Tektronix Inc."
 __credits__ = ["Addison Raak", "Michael Antkiewicz", "Ka'ulu Ng", "Nicholas Baldwin"]
 
 import os

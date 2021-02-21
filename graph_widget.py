@@ -11,10 +11,10 @@ import matplotlib.pyplot as plt
 # Class for a FigureCanvas
 class DrawGraph(QtWidgets.QWidget):
 
-    def __init__(self, figure, canvas, dpx_graph_data=None):
+    def __init__(self, figure, canvas, graph_data=None):
         super(QtWidgets.QWidget, self).__init__()
         self.graph_figure = figure
-        self.graph_data = dpx_graph_data
+        self.graph_data = graph_data
         self.graph_canvas = canvas
 
         self.font_size = 12

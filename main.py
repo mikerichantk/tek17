@@ -5,6 +5,7 @@ __credits__ = ["Addison Raak", "Michael Antkiewicz", "Ka'ulu Ng", "Nicholas Bald
 import sys
 import os
 import random
+import numpy as np
 import matplotlib
 matplotlib.use('Qt5Agg')
 
@@ -90,10 +91,56 @@ class OverlayWidget(QtWidgets.QWidget):
 
         # add graph widget
         self.graph_figure = plt.figure(1, figsize=(5, 10))
+        # add axis labels
+        ax = self.graph_figure.add_subplot(111)
+        ax.set_xlabel("Frequency", fontsize=30)
+        ax.set_ylabel("Amplitude", fontsize=30)
+        # make the graph
         self.graph_canvas = FigureCanvas(self.graph_figure)
         self.graph_widget = DrawGraph(self.graph_figure, self.graph_canvas)
 
         layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
+
+    # Updates graph with new data  (help: graph_widget from DPX code)
+    # new_graph_data is from dpx_graph_data_stream.py
+    # update_graph is called in Live_Tab.py
+    def update_graph(self, new_graph_data):
+        ax = self.graph_figure.get_axes()[0]
+
+        # clear and redraw axis
+        ax.clear()
+        ax.set_xlabel("Frequency", fontsize=30)
+        ax.set_ylabel("Amplitude", fontsize=30)
+
+        num_x_ticks = 5
+        num_y_ticks = 5
+
+        # set x-axis values based on center frequency and span
+        x_start = new_graph_data.center_frequency - new_graph_data.span / 2
+        x_end = new_graph_data.center_frequency + new_graph_data.span / 2
+
+        # set y-axis values based on reflevel of new_graph_data
+        y_start = new_graph_data.ref_level
+        y_end = new_graph_data.min_level
+
+        # np.linspace returns evenly spaced numbers over an interval
+        x_ticks = np.linspace(0, new_graph_data.bitmap_width - 1, num_x_ticks)
+        y_ticks = np.linspace(0, new_graph_data.bitmap_height - 1, num_y_ticks)
+
+        x_ticklabels = list(map(lambda tick: str(tick / 1e6), np.linspace(x_start, x_end, num_x_ticks)))
+        y_ticklabels = np.linspace(y_start, y_end, num_y_ticks)
+
+        ax.set_xticks(x_ticks)
+        ax.set_yticks(y_ticks)
+
+        ax.set_xticklabels(x_ticklabels)
+        ax.set_yticklabels(y_ticklabels)
+
+        # display bitmap from new_graph_data on graph
+        ax.imshow(new_graph_data.DPX_bitmap, cmap='gist_stern', aspect='auto')
+
+        self.draw()
+
 
     def click_up(self):
         print("Up button was pressed.")

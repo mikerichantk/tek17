@@ -66,7 +66,6 @@ class RSAInterface:
 
         RSAInterface.rsa.CONFIG_Preset()
 
-
     # set the spectrum values to default to avoid communication errors
     # page 16 of RSA_API_Guide pdf
     def config_spectrum(self, rsaCfg):

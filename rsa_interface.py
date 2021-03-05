@@ -9,7 +9,6 @@ from rsa_config import RSAConfig
 from RSA_API import *
 
 
-
 class RSAInterface:
     # Creates an RSA object to access its functionality
     rsa = None
@@ -84,6 +83,22 @@ class RSAInterface:
             print("More than one device found. Expected one.")
 
         RSAInterface.rsa.CONFIG_Preset()
+        ''' RSA_example.py def search_connect():
+                print('API Version {}'.format(DEVICE_GetAPIVersion_py()))
+                try:
+                    numDevicesFound, deviceIDs, deviceSerial, deviceType = DEVICE_Search_py()
+                except RSAError:
+                    print(RSAError)
+                print('Number of devices: {}'.format(numDevicesFound))
+                if numDevicesFound > 0:
+                    print('Device serial numbers: {}'.format(deviceSerial[0].decode()))
+                    print('Device type: {}'.format(deviceType[0].decode()))
+                    DEVICE_Connect_py(deviceIDs[0])
+                else:
+                    print('No devices found, exiting script.')
+                    exit()
+                CONFIG_Preset_py()
+        '''
 
     # set the spectrum values to default to avoid communication errors
     # page 16 of RSA_API_Guide pdf

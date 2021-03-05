@@ -91,7 +91,7 @@ class GraphDataStream:
     def get_dpx_data_while_open(self):
         while self.is_open():
             try:
-                yield self.get_dpx_data()
+                yield self.get_data()
             except (RSAError, ValueError) as err:
                 print(err)
                 if not self.is_open():
@@ -186,7 +186,7 @@ def create_data_stream(rsa_config=RSAConfig()):
 
 class MockGraphDataStream:
     # rsa to stream data out of
-    is_open = False
+    __is_open = False
 
     # current configuration of the rsa
     rsa_config = RSAConfig()
@@ -248,18 +248,18 @@ class MockGraphDataStream:
         self.__exit__(None, None, None)
 
     def is_open(self):
-        return self.is_open
+        return self.__is_open
 
     # The enter function to open the stream
     def __enter__(self):
         print("Enter mock stream")
-        self.is_open = True
+        self.__is_open = True
 
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         print("Exit mock stream")
-        self.is_open = False
+        self.__is_open = False
 
         # raise the exception to the next level
         return False

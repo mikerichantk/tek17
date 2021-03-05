@@ -21,7 +21,7 @@ import serial
 
 # change this port number based on the machine you are using
 # will need to get changed if the USB port changes
-arduinoData = serial.Serial("/dev/cu.usbmodem143401", 9600)
+# arduinoData = serial.Serial("/dev/cu.usbmodem145401", 9600)
 
 
 # Class for the main widget of the program, which will have the tab manager
@@ -206,7 +206,7 @@ class SideBySideWidget(QtWidgets.QWidget):
 
         # move_button_container.addChildLayout()
 
-        # Connects the move buttons to the click_xx methods
+        # Connects the move buttons to the click_xx methods (calls click_xx when pressed)
         self.move_buttons[0].clicked.connect(self.click_up)
         self.move_buttons[1].clicked.connect(self.click_down)
         self.move_buttons[2].clicked.connect(self.click_left)
@@ -223,25 +223,28 @@ class SideBySideWidget(QtWidgets.QWidget):
         self.move_buttons[2].setAutoRepeat(True)
         self.move_buttons[3].setAutoRepeat(True)
 
+        # Connects the zoom buttons to the zoom_xx methods (calls zoom_xx when pressed)
         self.zoom_buttons[0].clicked.connect(self.click_zoom_in)
         self.zoom_buttons[1].clicked.connect(self.click_zoom_out)
 
     # prints what button was pressed, then sends a move signal to the arduino
     def click_up(self):
         print("Up button was pressed.")
-        arduinoData.write(b'w')
+        # uses PySerial to send serial signals to the Arduino, which was previously flashed with the code:
+        # "/arduino_mast_control/arduino_mast_control.ino"
+        # arduinoData.write(b'w')
 
     def click_down(self):
         print("Down button was pressed.")
-        arduinoData.write(b's')
+        # arduinoData.write(b's')
 
     def click_left(self):
         print("Left button was pressed.")
-        arduinoData.write(b'a')
+        # arduinoData.write(b'a')
 
     def click_right(self):
         print("Right button was pressed.")
-        arduinoData.write(b'd')
+        # arduinoData.write(b'd')
 
     def click_zoom_in(self):
         print("Zoom in button pressed.")

@@ -17,20 +17,20 @@ from rsa_interface import RSAInterface
 # this class is in charge of connecting and disconnecting from an RSA
 class GraphDataStream:
     # rsa to stream data out of
-    rsa = None
+    __rsa = None
 
     # rsa lock
-    rsa_lock = Lock()
+    __rsa_lock = Lock()
 
     # current configuration of the rsa
-    rsa_config = RSAConfig()
+    __rsa_config = RSAConfig()
 
     # current trigger for the rsa
-    trigger = None
+    __trigger = None
 
     # hold previously returns DPXGraphData objects
-    buffer_size = 10
-    dpx_data_buffer = []
+    __buffer_size = 10
+    __dpx_data_buffer = []
 
     # Changes the configuration of the RSA
     #
@@ -40,18 +40,18 @@ class GraphDataStream:
         if rsa_config == None:
             raise ValueError("rsa_config cannot be None")
 
-        self.rsa_config = rsa_config
+        self.__rsa_config = rsa_config
 
         if self.rsa != None:
-            self.rsa_lock.acquire()
-            self.rsa.config_DPX(self.rsa_config)
-            self.rsa_lock.release()
+            self.__rsa_lock.acquire()
+            self.__rsa.config_DPX(self.__rsa_config)
+            self.__rsa_lock.release()
 
     # Sets a trigger
     # !!! Currently does not work !!!
     def set_trigger(self, trigger):
-        self.trigger = trigger
-        new_config = self.rsa_config
+        self.__trigger = trigger
+        new_config = self.__rsa_config
 
         # show only trig frame iff we are setting a trigger
         new_config.showOnlyTrigFrame = trigger is not None
@@ -66,21 +66,21 @@ class GraphDataStream:
             raise ValueError("Cannot get DPX data from a closed stream")
 
         try:
-            self.rsa_lock.acquire()
-            if self.rsa is None:
-                self.rsa_lock.release()
+            self.__rsa_lock.acquire()
+            if self.__rsa is None:
+                self.__rsa_lock.release()
                 raise ValueError("Cannot get DPX data from a closed stream")
 
-            fb = self.__rsa.acquire_dpx_frame(self.trigger)
-            self.rsa_lock.release()
+            fb = self.__rsa.acquire_dpx_frame(self.__trigger)
+            self.__rsa_lock.release()
         except RSAError as err:
-            self.rsa_lock.release()
+            self.__rsa_lock.release()
             self.close()
             raise RSAError("Could not acquire frame, closing stream")
 
-        bitmap, dpx_traces = self.rsa.extract_dpx_spectrum(fb)
+        bitmap, dpx_traces = self.__rsa.extract_dpx_spectrum(fb)
 
-        data = create_data(bitmap, self.rsa_config)
+        data = create_data(bitmap, self.__rsa_config)
 
         self.__add_to_buffer(data)
 
@@ -102,10 +102,10 @@ class GraphDataStream:
     #   dpx_data <DPXGraphData>: the data to buffer
     def __add_to_buffer(self, data):
         # push the new data into the buffer
-        self.data_buffer.insert(0, data)
+        self.__data_buffer.insert(0, data)
 
         # get rid of any data exceeding the buffer size
-        self.data_buffer = self.data_buffer[:self.buffer_size]
+        self.__data_buffer = self.__data_buffer[:self.__buffer_size]
 
     # Parameters:
     #   count <int>: optionally specifies the number of data to return
@@ -115,9 +115,9 @@ class GraphDataStream:
     #   the DPXGraphData that was most recently returned by get_dpx_data
     def get_previous_dpx_data(self, count=None):
         if count == None:
-            return self.data_buffer[0]
+            return self.__data_buffer[0]
 
-        return self.data_buffer[0:count]
+        return self.__data_buffer[0:count]
 
     # Opens this stream
     def open(self):
@@ -128,7 +128,7 @@ class GraphDataStream:
 
     # Closes this stream
     def close(self):
-        if self.rsa is None:
+        if self.__rsa is None:
             raise ValueError('Stream is not open -- cannot close')
 
         self.__exit__(None, None, None)
@@ -136,12 +136,12 @@ class GraphDataStream:
     # Returns:
     #   a boolean, whether the stream is open
     def is_open(self):
-        return self.rsa is not None
+        return self.__rsa is not None
 
     # The enter function to open the stream
     def __enter__(self):
         print("Enter stream")
-        self.rsa = RSAInterface.get_instance()
+        self.__rsa = RSAInterface.get_instance()
 
         try:
             self.__rsa.search_connect()
@@ -151,16 +151,16 @@ class GraphDataStream:
             print(e)
             raise e
 
-        self.__rsa.config_DPX(self.rsa_config)
+        self.__rsa.config_DPX(self.__rsa_config)
 
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         print("Exit stream")
 
-        self.rsa_lock.acquire()
-        self.rsa.disconnect_rsa()
-        self.rsa_lock.release()
+        self.__rsa_lock.acquire()
+        self.__rsa.disconnect_rsa()
+        self.__rsa_lock.release()
 
         self.rsa = None
 
@@ -189,16 +189,16 @@ class MockGraphDataStream:
     __is_open = False
 
     # current configuration of the rsa
-    rsa_config = RSAConfig()
+    __rsa_config = RSAConfig()
 
-    buffer_size = 10
-    data_buffer = []
+    __buffer_size = 10
+    __data_buffer = []
 
     def set_rsa_config(self, rsa_config):
         if rsa_config == None:
             raise ValueError("rsa_config cannot be None")
 
-        self.rsa_config = rsa_config
+        self.__rsa_config = rsa_config
 
     # get a mock data with random output
     def get_data(self):
@@ -209,7 +209,7 @@ class MockGraphDataStream:
                 for j in range(bitmap.shape[1]):
                     bitmap[i][j] = 4
 
-        data = create_data(bitmap, self.rsa_config)
+        data = create_data(bitmap, self.__rsa_config)
 
         self.add_to_buffer(data)
 
@@ -221,19 +221,19 @@ class MockGraphDataStream:
 
     def add_to_buffer(self, dpx_data):
         # push the new data into the buffer
-        self.data_buffer.insert(0, dpx_data)
+        self.__data_buffer.insert(0, dpx_data)
 
         # get rid of any data exceeding the buffer size
-        self.data_buffer = self.data_buffer[:self.buffer_size]
+        self.__data_buffer = self.__data_buffer[:self.__buffer_size]
 
     # return the data that was most recently returned by get_data
     # if a count is supplied, a list of count datas (up to the buffer size) are returned
     # if no count is supplied, a single dpx data is returned
     def get_previous_data(self, count=None):
         if count == None:
-            return self.data_buffer[0]
+            return self.__data_buffer[0]
 
-        return self.data_buffer[0:count]
+        return self.__data_buffer[0:count]
 
     def open(self):
         if self.is_open():

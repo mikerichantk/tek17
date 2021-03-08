@@ -4,12 +4,11 @@ import matplotlib.pyplot as plt
 
 
 __author__ = "Cole French, Chris Lytle, Alexander Nowlin, Pouya Rad"
-__copyright__ = "Copyright 2019, Tektronix Inc."
+__copyright__ = "Copyright 2017-19, Tektronix Inc."
 __credits__ = ["Cole French", "Chris Lytle", "Alexander Nowlin", "Pouya Rad"]
 
 
 class GraphWidget(QtWidgets.QWidget):
-
 
     def __init__(self, figure, canvas, dpx_graph_data=None):
         super(QtWidgets.QWidget, self).__init__()
@@ -25,11 +24,9 @@ class GraphWidget(QtWidgets.QWidget):
 
         self.draw_DPX_graph()
 
-
     def update_graph(self, new_graph_data):
         self.__dpx_graph_data = new_graph_data
         self.draw_DPX_graph()
-
 
     # Draws the graph in the log based on the given bitmap data.
     # This is where the attributes are set for data, title, x and y labels,
@@ -63,7 +60,6 @@ class GraphWidget(QtWidgets.QWidget):
                                numTicks), yTicks)
         plt.tight_layout()
         self.graph_canvas.draw()
-
 
     # Clears the graph of all data points but keeps
     # the title and axis names

@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Qt5Agg')
 
-from gui_graph_widget import DrawGraph
+from gui_graph_widget import GraphWidget
 
 from numpy import arange, sin, pi
 from PyQt5 import QtWidgets, QtCore
@@ -21,7 +21,7 @@ import serial
 
 # change this port number based on the machine you are using
 # will need to get changed if the USB port changes
-arduinoData = serial.Serial("COM6")
+arduinoData = serial.Serial("/dev/cu.usbmodem145401", 9600)
 
 
 # Class for the main widget of the program, which will have the tab manager
@@ -102,10 +102,9 @@ class OverlayWidget(QtWidgets.QWidget):
         ax.set_ylabel("Amplitude", fontsize=30)
         # make the graph
         self.graph_canvas = FigureCanvas(self.graph_figure)
-        self.graph_widget = DrawGraph(self.graph_figure, self.graph_canvas)
+        self.graph_widget = GraphWidget(self.graph_figure, self.graph_canvas)
 
         layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
-
 
     def click_up(self):
         print("Up button was pressed.")

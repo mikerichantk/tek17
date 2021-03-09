@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Qt5Agg')
 
-from graph_widget import DrawGraph
+from gui_graph_widget import GraphWidget
 
 from numpy import arange, sin, pi
 from PyQt5 import QtWidgets, QtCore
@@ -21,7 +21,7 @@ import serial
 
 # change this port number based on the machine you are using
 # will need to get changed if the USB port changes
-# arduinoData = serial.Serial("/dev/cu.usbmodem145401", 9600)
+arduinoData = serial.Serial("/dev/cu.usbmodem145401", 9600)
 
 
 # Class for the main widget of the program, which will have the tab manager
@@ -102,50 +102,9 @@ class OverlayWidget(QtWidgets.QWidget):
         ax.set_ylabel("Amplitude", fontsize=30)
         # make the graph
         self.graph_canvas = FigureCanvas(self.graph_figure)
-        self.graph_widget = DrawGraph(self.graph_figure, self.graph_canvas)
+        self.graph_widget = GraphWidget(self.graph_figure, self.graph_canvas)
 
         layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
-
-    # Updates graph with new data  (help: graph_widget from DPX code)
-    # new_graph_data is from dpx_graph_data_stream.py
-    # update_graph is called in Live_Tab.py
-    def update_graph(self, new_graph_data):
-        ax = self.graph_figure.get_axes()[0]
-
-        # clear and redraw axis
-        ax.clear()
-        ax.set_xlabel("Frequency", fontsize=30)
-        ax.set_ylabel("Amplitude", fontsize=30)
-
-        num_x_ticks = 5
-        num_y_ticks = 5
-
-        # set x-axis values based on center frequency and span
-        x_start = new_graph_data.center_frequency - new_graph_data.span / 2
-        x_end = new_graph_data.center_frequency + new_graph_data.span / 2
-
-        # set y-axis values based on reflevel of new_graph_data
-        y_start = new_graph_data.ref_level
-        y_end = new_graph_data.min_level
-
-        # np.linspace returns evenly spaced numbers over an interval
-        x_ticks = np.linspace(0, new_graph_data.bitmap_width - 1, num_x_ticks)
-        y_ticks = np.linspace(0, new_graph_data.bitmap_height - 1, num_y_ticks)
-
-        x_ticklabels = list(map(lambda tick: str(tick / 1e6), np.linspace(x_start, x_end, num_x_ticks)))
-        y_ticklabels = np.linspace(y_start, y_end, num_y_ticks)
-
-        ax.set_xticks(x_ticks)
-        ax.set_yticks(y_ticks)
-
-        ax.set_xticklabels(x_ticklabels)
-        ax.set_yticklabels(y_ticklabels)
-
-        # display bitmap from new_graph_data on graph
-        ax.imshow(new_graph_data.DPX_bitmap, cmap='gist_stern', aspect='auto')
-
-        self.draw()
-
 
     def click_up(self):
         print("Up button was pressed.")
@@ -180,22 +139,22 @@ class SideBySideWidget(QtWidgets.QWidget):
         self.setLayout(layout_container)
 
         # create buttons to interact
-        self.move_buttons = [QtWidgets.QPushButton("UP"),
+        self.__move_buttons = [QtWidgets.QPushButton("UP"),
                              QtWidgets.QPushButton("DOWN"),
                              QtWidgets.QPushButton("LEFT"),
                              QtWidgets.QPushButton("RIGHT")]
 
-        self.zoom_buttons = [QtWidgets.QPushButton("Zoom In"),
+        self.__zoom_buttons = [QtWidgets.QPushButton("Zoom In"),
                              QtWidgets.QPushButton("Zoom Out")]
 
         # add the buttons to the layout
-        layout_container.addWidget(self.move_buttons[0], 1, 6, 1, 1)  # UP
-        layout_container.addWidget(self.move_buttons[1], 3, 6, 1, 1)  # DOWN
-        layout_container.addWidget(self.move_buttons[2], 2, 5, 1, 1)  # LEFT
-        layout_container.addWidget(self.move_buttons[3], 2, 7, 1, 1)  # RIGHT
+        layout_container.addWidget(self.__move_buttons[0], 1, 6, 1, 1)  # UP
+        layout_container.addWidget(self.__move_buttons[1], 3, 6, 1, 1)  # DOWN
+        layout_container.addWidget(self.__move_buttons[2], 2, 5, 1, 1)  # LEFT
+        layout_container.addWidget(self.__move_buttons[3], 2, 7, 1, 1)  # RIGHT
 
-        layout_container.addWidget(self.zoom_buttons[0], 2, 0, 1, 2)  # Zoom In
-        layout_container.addWidget(self.zoom_buttons[1], 2, 2, 1, 2)  # Zoom Out
+        layout_container.addWidget(self.__zoom_buttons[0], 2, 0, 1, 2)  # Zoom In
+        layout_container.addWidget(self.__zoom_buttons[1], 2, 2, 1, 2)  # Zoom Out
 
         # formatting the rows and columns, so the drawing of the
         layout_container.setRowStretch(0, 2)
@@ -207,10 +166,10 @@ class SideBySideWidget(QtWidgets.QWidget):
         # move_button_container.addChildLayout()
 
         # Connects the move buttons to the click_xx methods (calls click_xx when pressed)
-        self.move_buttons[0].clicked.connect(self.click_up)
-        self.move_buttons[1].clicked.connect(self.click_down)
-        self.move_buttons[2].clicked.connect(self.click_left)
-        self.move_buttons[3].clicked.connect(self.click_right)
+        self.__move_buttons[0].clicked.connect(self.click_up)
+        self.__move_buttons[1].clicked.connect(self.click_down)
+        self.__move_buttons[2].clicked.connect(self.click_left)
+        self.__move_buttons[3].clicked.connect(self.click_right)
 
         ''''
             For some reason, python didn't like iterating over a list of QPushButtons in a for loop?
@@ -218,33 +177,33 @@ class SideBySideWidget(QtWidgets.QWidget):
             These next four lines makes it so you can press and hold the button down and repeatedly send move
             commands to the arduino (to then move the motors).
         '''
-        self.move_buttons[0].setAutoRepeat(True)
-        self.move_buttons[1].setAutoRepeat(True)
-        self.move_buttons[2].setAutoRepeat(True)
-        self.move_buttons[3].setAutoRepeat(True)
+        self.__move_buttons[0].setAutoRepeat(True)
+        self.__move_buttons[1].setAutoRepeat(True)
+        self.__move_buttons[2].setAutoRepeat(True)
+        self.__move_buttons[3].setAutoRepeat(True)
 
         # Connects the zoom buttons to the zoom_xx methods (calls zoom_xx when pressed)
-        self.zoom_buttons[0].clicked.connect(self.click_zoom_in)
-        self.zoom_buttons[1].clicked.connect(self.click_zoom_out)
+        self.__zoom_buttons[0].clicked.connect(self.click_zoom_in)
+        self.__zoom_buttons[1].clicked.connect(self.click_zoom_out)
 
     # prints what button was pressed, then sends a move signal to the arduino
     def click_up(self):
         print("Up button was pressed.")
         # uses PySerial to send serial signals to the Arduino, which was previously flashed with the code:
         # "/arduino_mast_control/arduino_mast_control.ino"
-        # arduinoData.write(b'w')
+        arduinoData.write(b'w')
 
     def click_down(self):
         print("Down button was pressed.")
-        # arduinoData.write(b's')
+        arduinoData.write(b's')
 
     def click_left(self):
         print("Left button was pressed.")
-        # arduinoData.write(b'a')
+        arduinoData.write(b'a')
 
     def click_right(self):
         print("Right button was pressed.")
-        # arduinoData.write(b'd')
+        arduinoData.write(b'd')
 
     def click_zoom_in(self):
         print("Zoom in button pressed.")

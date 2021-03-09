@@ -6,6 +6,7 @@ import sys
 import os
 import random
 import matplotlib
+import cv2
 matplotlib.use('Qt5Agg')
 
 from graph_widget import DrawGraph
@@ -46,6 +47,10 @@ class OverlayWidget(QtWidgets.QWidget):
 
     def __init__(self):
         super(QtWidgets.QWidget, self).__init__()
+
+#############################
+#layout_container.addWidget(for camera feed)
+#################################
 
         # main layout container for the overlay, and the buttons
         # overlay_container = QtWidgets.QVBoxLayout()
@@ -119,6 +124,9 @@ class OverlayWidget(QtWidgets.QWidget):
 
 # Class for the Side-by-Side Tab
 class SideBySideWidget(QtWidgets.QWidget):
+
+
+
 
     def __init__(self):
         super(QtWidgets.QWidget, self).__init__()

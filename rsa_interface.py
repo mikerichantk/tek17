@@ -40,26 +40,52 @@ class RSAInterface:
         if RSAInterface.__rsa is None:
             # change the directory so the dll file will work
             current_dir = os.getcwd()
-            RSAInterface.__rsa = RSAInterface.init_RSA_interface(self)
+            RSAInterface.__rsa = RSAInterface.__try_init_RSA_Interface()
             os.chdir(current_dir)
 
     # Loads the RSA_API.dll file if it exists
+    # @staticmethod
+    # def __try_init_RSA_interface():
+    #     if DLL_loader.change_cwd(DLL_loader.RSA_DLL_PATH_x64):
+    #         rsa = cdll.LoadLibrary(DLL_loader.RSA_DLL_FILENAME)
+    #         if rsa is not None:
+    #             return rsa
+    #     elif DLL_loader.change_cwd(DLL_loader.RSA_DLL_PATH_x84):
+    #         rsa = cdll.LoadLibrary(DLL_loader.RSA_DLL_FILENAME)
+    #         if rsa is not None:
+    #             return rsa
+    #     return None
+
     @staticmethod
-    def init_RSA_interface():
+    def __try_init_RSA_Interface():
         if DLL_loader.change_cwd(DLL_loader.RSA_DLL_PATH_x64):
-            rsa = cdll.LoadLibrary(DLL_loader.DLL_FULL_PATH_x64)
+            rsa = RSAInterface.__try_load_dll()
             if rsa is not None:
                 return rsa
-        elif DLL_loader.change_cwd(DLL_loader.RSA_DLL_PATH_x84):
-            rsa = WinDLL(DLL_loader.DLL_FULL_PATH_x84)
+        # If x64 version failed, try loading the x86 version.
+        if DLL_loader.change_cwd(DLL_loader.RSA_DLL_PATH_x84):
+            rsa = RSAInterface.__try_load_dll()
             if rsa is not None:
                 return rsa
         return None
 
+    @staticmethod
+    def __try_load_dll():
+        try:
+            rsa = cdll.LoadLibrary(DLL_loader.RSA_DLL_FILENAME)
+            return rsa
+        except OSError:
+            return None
+
+    # Check for errors
+    def err_check(self, rs):
+        if ReturnStatus(rs) != ReturnStatus.noError:
+            raise RSAError(ReturnStatus(rs).name)
+
     # Connects to the RSA
     # ################## RSA PDF GUIDE PAGE 6 ################## #
     @staticmethod
-    def connect_rsa(self):
+    def search_connect(self):
         # throws Not Connected error if the RSA is not initialized
         if RSAInterface.__rsa is None:
             raise RSAError(ReturnStatus.errorNotConnected.name)
@@ -71,6 +97,13 @@ class RSAInterface:
         deviceIDs = intArray()
         deviceSerial = create_string_buffer(DEVSRCH_SERIAL_MAX_STRLEN)
         deviceType = create_string_buffer(DEVSRCH_TYPE_MAX_STRLEN)
+        apiVersion = create_string_buffer(DEVINFO_MAX_STRLEN)
+
+        RSAInterface.__rsa.DEVICE_GetAPIVersion(apiVersion)
+        print('API Version {}'.format(apiVersion.value.decode()))
+
+        self.err_check(RSAInterface.__rsa.DEVICE_Search(byref(numFound), deviceIDs,
+                                                        deviceSerial, deviceType))
 
         # Checks to see how many RSA's are connected. Currently only supports 1.
         if numFound.value < 1:
@@ -85,6 +118,7 @@ class RSAInterface:
             print("More than one device found. Expected one.")
 
         RSAInterface.__rsa.CONFIG_Preset()
+        ''' THIS IS FROM THE RSA EXAMPLE CODE ON GITHUB '''
         ''' RSA_example.py def search_connect():
                 print('API Version {}'.format(DEVICE_GetAPIVersion_py()))
                 try:
@@ -108,7 +142,7 @@ class RSAInterface:
         RSAInterface.__rsa.SPECTRUM_SetEnable(c_bool(True))
         RSAInterface.__rsa.CONFIG_SetCenterFreq(rsaCfg.cf)
         RSAInterface.__rsa.CONFIG_SetReferenceLevel(rsaCfg.refLevel)
-        RSAInterface.SPECTRUM_SetDefault()
+        RSAInterface.__rsa.SPECTRUM_SetDefault()
         specSet = Spectrum_Settings()
         RSAInterface.__rsa.SPECTRUM_GetSettings(byref(specSet))
         specSet.window = SpectrumWindows.SpectrumWindow_Kaiser
@@ -202,10 +236,38 @@ class RSAInterface:
         RSAInterface.__rsa.DEVICE_Stop()
         return fb
 
-    # Check for errors from the RSA
-    def error_checker(self, status):
-        if ReturnStatus(status) != ReturnStatus.noError:
-            raise RSAError(ReturnStatus(status.names))
+    def extract_dpx_spectrum(selfself, fb):
+        # When converting a ctypes pointer to a numpy array, we need to
+        # explicitly specify its length to dereference it correctly
+        dpxBitmap = np.array(fb.spectrumBitmap[:fb.spectrumBitmapSize])
+        dpxBitmap = dpxBitmap.reshape((fb.spectrumBitmapHeight,
+                                       fb.spectrumBitmapWidth))
+
+        # Grab trace data and convert from W to dBm
+        # http://www.rapidtables.com/convert/power/Watt_to_dBm.htm
+        # Note: fb.spectrumTraces is a pointer to a pointer, so we need to
+        # go through an additional dereferencing step
+        traces = []
+        for i in range(3):
+            traces.append(10 * np.log10(1000 * np.array(
+                fb.spectrumTraces[i][:fb.spectrumTraceLength])) + 30)
+        # specTrace2 = 10 * np.log10(1000*np.array(
+        #     fb.spectrumTraces[1][:fb.spectrumTraceLength])) + 30
+        # specTrace3 = 10 * np.log10(1000*np.array(
+        #     fb.spectrumTraces[2][:fb.spectrumTraceLength])) + 30
+
+        # return dpxBitmap, specTrace1, specTrace2, specTrace3
+        return dpxBitmap, traces
+
+    def extract_dpxogram(self, fb):
+        # When converting a ctypes pointer to a numpy array, we need to
+        # explicitly specify its length to dereference it correctly
+        dpxogram = np.array(fb.sogramBitmap[:fb.sogramBitmapSize])
+        dpxogram = dpxogram.reshape((fb.sogramBitmapHeight,
+                                     fb.sogramBitmapWidth))
+        dpxogram = dpxogram[:fb.sogramBitmapNumValidLines, :]
+
+        return dpxogram
 
     # Helper method to disconnect the RSA
     def disconenct_rsa(self):

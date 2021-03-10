@@ -42,7 +42,7 @@ class GraphDataStream:
 
         self.__rsa_config = rsa_config
 
-        if self.rsa != None:
+        if self.__rsa != None:
             self.__rsa_lock.acquire()
             self.__rsa.config_DPX(self.__rsa_config)
             self.__rsa_lock.release()
@@ -121,7 +121,7 @@ class GraphDataStream:
 
     # Opens this stream
     def open(self):
-        if self.rsa is not None:
+        if self.__rsa is not None:
             raise ValueError('Stream is already open -- cannot open')
 
         self.__enter__()

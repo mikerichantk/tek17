@@ -7,6 +7,7 @@ import numpy as np
 import DLL_loader
 from rsa_config import RSAConfig
 from RSA_API import *
+from ctypes import cdll
 
 
 class RSAInterface:
@@ -58,12 +59,12 @@ class RSAInterface:
 
     @staticmethod
     def __try_init_RSA_Interface():
-        if DLL_loader.change_cwd(DLL_loader.RSA_DLL_PATH_x64):
+        if DLL_loader.change_cwd(DLL_loader.FULL_DLL_PATH_x64):
             rsa = RSAInterface.__try_load_dll()
             if rsa is not None:
                 return rsa
         # If x64 version failed, try loading the x86 version.
-        if DLL_loader.change_cwd(DLL_loader.RSA_DLL_PATH_x84):
+        if DLL_loader.change_cwd(DLL_loader.FULL_DLL_PATH_x84):
             rsa = RSAInterface.__try_load_dll()
             if rsa is not None:
                 return rsa
@@ -72,6 +73,7 @@ class RSAInterface:
     @staticmethod
     def __try_load_dll():
         try:
+            steven = os.getcwd()
             rsa = cdll.LoadLibrary(DLL_loader.RSA_DLL_FILENAME)
             return rsa
         except OSError:

@@ -7,10 +7,12 @@ import os
 import random
 import matplotlib
 import cv2
+from PyQt5.QtWidgets import QFrame, QHBoxLayout
+
 matplotlib.use('Qt5Agg')
 
 from graph_widget import DrawGraph
-
+from PyQt5 import Qt
 from numpy import arange, sin, pi
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
@@ -47,10 +49,6 @@ class OverlayWidget(QtWidgets.QWidget):
 
     def __init__(self):
         super(QtWidgets.QWidget, self).__init__()
-
-#############################
-#layout_container.addWidget(for camera feed)
-#################################
 
         # main layout container for the overlay, and the buttons
         # overlay_container = QtWidgets.QVBoxLayout()
@@ -125,7 +123,9 @@ class OverlayWidget(QtWidgets.QWidget):
 # Class for the Side-by-Side Tab
 class SideBySideWidget(QtWidgets.QWidget):
 
-
+    # add spot for camera feed
+    # layout_container.addWidget()
+    #################################
 
 
     def __init__(self):
@@ -167,6 +167,22 @@ class SideBySideWidget(QtWidgets.QWidget):
 
         self.zoom_buttons[0].clicked.connect(self.click_zoom_in)
         self.zoom_buttons[1].clicked.connect(self.click_zoom_out)
+
+        # add graph widget
+        self.graph_figure = plt.figure(1, figsize=(5, 10))
+        self.graph_canvas = FigureCanvas(self.graph_figure)
+        self.graph_widget = DrawGraph(self.graph_figure, self.graph_canvas)
+        layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
+
+        #add temporary box where video feed will go
+        videoBox = QHBoxLayout()
+        videoFrame = QFrame(self)
+        videoFrame.setFrameShape(QFrame.StyledPanel)
+        videoFrame.setLineWidth(0.6)
+        videoFrame.setGeometry(1000, 100, 800, 600)
+        videoBox.addWidget(videoFrame)
+        self.setLayout(videoBox)
+
 
     def click_up(self):
         print("Up button was pressed.")

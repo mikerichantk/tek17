@@ -16,7 +16,7 @@ class VideoThread(QThread):
 
     def run(self):
         # capture from web cam
-        cap = cv2.VideoCapture("rtsp://169.254.161.100:554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream")
+        cap = cv2.VideoCapture(0)
         while self._run_flag:
             ret, cv_img = cap.read()
             if ret:

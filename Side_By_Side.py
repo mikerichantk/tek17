@@ -33,8 +33,7 @@ class VideoThread(QThread):
 
     def run(self):
         # capture from web cam
-        cap = cv2.VideoCapture(
-            "rtsp://169.254.161.100:554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream")
+        cap = cv2.VideoCapture("rtsp://169.254.161.100:554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream")
         while self._run_flag:
             ret, cv_img = cap.read()
             if ret:
@@ -184,7 +183,7 @@ class AppMainWindow(QtWidgets.QMainWindow):
 
 # runs the application
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    # runs AppMainWindow class as main container
-    main_window = AppMainWindow()
+    app = QApplication(sys.argv)
+    a = Side_By_Side_Tab()
+    a.show()
     sys.exit(app.exec_())

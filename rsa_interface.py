@@ -7,7 +7,7 @@ import numpy as np
 import DLL_loader
 from rsa_config import RSAConfig
 from RSA_API import *
-from ctypes import cdll
+from ctypes import *
 
 
 class RSAInterface:
@@ -73,7 +73,6 @@ class RSAInterface:
     @staticmethod
     def __try_load_dll():
         try:
-            steven = os.getcwd()
             rsa = cdll.LoadLibrary(DLL_loader.RSA_DLL_FILENAME)
             return rsa
         except OSError:
@@ -95,7 +94,8 @@ class RSAInterface:
         # numFound used later to hold number of available RSA's that connected
         # page 6 of pdf
         numFound = c_int(0)
-        intArray = c_int * DEVSRCH_MAX_NUM_DEVICES
+        # intArray = c_int * DEVSRCH_MAX_NUM_DEVICES
+        intArray = c_int * 10
         deviceIDs = intArray()
         deviceSerial = create_string_buffer(DEVSRCH_SERIAL_MAX_STRLEN)
         deviceType = create_string_buffer(DEVSRCH_TYPE_MAX_STRLEN)
@@ -104,9 +104,10 @@ class RSAInterface:
         RSAInterface.__rsa.DEVICE_GetAPIVersion(apiVersion)
         print('API Version {}'.format(apiVersion.value.decode()))
 
-        self.err_check(RSAInterface.__rsa.DEVICE_Search(byref(numFound), deviceIDs,
-                                                        deviceSerial, deviceType))
+        # self.err_check(RSAInterface.__rsa.DEVICE_Search(byref(numFound), deviceIDs,
+        #                                                 deviceSerial, deviceType))
 
+        RSAInterface.__rsa.DEVICE_Search(byref(numFound), deviceIDs, deviceSerial, deviceType)
         # Checks to see how many RSA's are connected. Currently only supports 1.
         if numFound.value < 1:
             print("No RSA found.")
@@ -141,7 +142,8 @@ class RSAInterface:
     # set the spectrum values to default to avoid communication errors
     # page 16 of RSA_API_Guide pdf
     def config_spectrum(self, rsaCfg):
-        RSAInterface.__rsa.SPECTRUM_SetEnable(c_bool(True))
+        enable = c_bool(True)
+        RSAInterface.__rsa.SPECTRUM_SetEnable(enable)
         RSAInterface.__rsa.CONFIG_SetCenterFreq(rsaCfg.cf)
         RSAInterface.__rsa.CONFIG_SetReferenceLevel(rsaCfg.refLevel)
         RSAInterface.__rsa.SPECTRUM_SetDefault()
@@ -154,6 +156,22 @@ class RSAInterface:
         RSAInterface.__rsa.SPECTRUM_SetSettings(specSet)
         RSAInterface.__rsa.SPECTRUM_GetSettings(byref(specSet))
         return specSet
+
+    def acquire_spectrum(self, specSet):
+        ready = c_bool(False)
+        traceArray = c_float * specSet.traceLength
+        traceData = traceArray()
+        outTracePoints = c_int(0)
+        traceSelector = SpectrumTraces.SpectrumTrace1
+
+        RSAInterface.__rsa.DEVICE_Run()
+        RSAInterface.__rsa.SPECTRUM_AcquireTrace()
+        while not ready.value:
+            RSAInterface.__rsa.SPECTRUM_WaitForDataReady(c_int(100), byref(ready))
+        RSAInterface.__rsa.SPECTRUM_GetTrace(traceSelector, specSet.traceLength, byref(traceData),
+                                             byref(outTracePoints))
+        RSAInterface.__rsa.DEVICE_Stop()
+        return np.array(traceData)
 
     # refLevel and refLevelOffset are used to determine the upper and lower bounds
     # for the y-axis of the frame.

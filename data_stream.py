@@ -37,12 +37,12 @@ class GraphDataStream:
     # Parameters:
     #   rsa_config <RSAConfig>: The configuration to update this stream's RSA with
     def set_rsa_config(self, rsa_config):
-        if rsa_config == None:
+        if rsa_config is None:
             raise ValueError("rsa_config cannot be None")
 
         self.__rsa_config = rsa_config
 
-        if self.__rsa != None:
+        if self.__rsa is not None:
             self.__rsa_lock.acquire()
             self.__rsa.config_DPX(self.__rsa_config)
             self.__rsa_lock.release()

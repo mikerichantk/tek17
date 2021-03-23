@@ -20,7 +20,7 @@ class RSAConfig:
         self.yUnit = VerticalUnitType.VerticalUnit_dBm
         self.yTop = c_double(refLevel)
         self.yBottom = c_double(refLevel - refLevelOffset)
-        self.infinitePersistence = c_bool(False)
+        self.infinitePersistence = c_bool(True)
         self.persistenceTimeSec = c_double(persistence)
         self.showOnlyTrigFrame = c_bool(False)
 

@@ -73,9 +73,13 @@ class RSAInterface:
     @staticmethod
     def __try_load_dll():
         try:
-            rsa = cdll.LoadLibrary(DLL_loader.RSA_DLL_FILENAME)
+            print(os.getcwd())
+            print(DLL_loader.RSA_DLL_FILENAME)
+            print(DLL_loader.FULL_DLL_PATH_x64)
+            rsa = cdll.LoadLibrary("C:/Users/Mikey/Desktop/School/Capstone/tek17/RSA_API/lib/x64/RSA_API.dll")
             return rsa
-        except OSError:
+        except OSError as e:
+            print(e)
             return None
 
     # Check for errors

@@ -61,7 +61,6 @@ class OverlayWidget(QtWidgets.QWidget):
         # overlay_container = QtWidgets.QVBoxLayout()
         # self.setLayout(overlay_container)
 
-        # layout container for the buttons
         layout_container = QtWidgets.QGridLayout()
         self.setLayout(layout_container)
 
@@ -123,6 +122,8 @@ class OverlayWidget(QtWidgets.QWidget):
 
         thread = Thread(target=self.update_live_widget)
         thread.start()
+
+        # ptz = onvifconfig.ptzcam()
 
     # thread target function
     # Opens dpx data stream and grabs frame from RSA while the stream remains open

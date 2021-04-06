@@ -60,13 +60,6 @@ class RSAInterface:
     # This method tries to load the dll file in order to initialize an rsa interface object, called rsa.
     @staticmethod
     def __try_init_RSA_Interface():
-        if DLL_loader.change_cwd("C:\\Tektronix\\RSA_API\\lib\\x64"):
-            rsa = RSAInterface.__try_load_dll()
-            if rsa is not None:
-                return rsa
-        # If x64 version failed, try loading the x86 version.
-        if DLL_loader.change_cwd("C:\\Tektronix\\RSA_API\\lib\\x86"):
-            rsa = RSAInterface.__try_load_dll()
         if DLL_loader.change_cwd(DLL_loader.FULL_DLL_PATH_x64):
             # rsa = RSAInterface.__try_load_dll()
             rsa = cdll.LoadLibrary("C:\\Tektronix\\RSA_API\\lib\\x64\\RSA_API.dll")

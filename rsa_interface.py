@@ -59,12 +59,12 @@ class RSAInterface:
 
     @staticmethod
     def __try_init_RSA_Interface():
-        if DLL_loader.change_cwd(DLL_loader.FULL_DLL_PATH_x64):
+        if DLL_loader.change_cwd("C:\\Tektronix\\RSA_API\\lib\\x64"):
             rsa = RSAInterface.__try_load_dll()
             if rsa is not None:
                 return rsa
         # If x64 version failed, try loading the x86 version.
-        if DLL_loader.change_cwd(DLL_loader.FULL_DLL_PATH_x84):
+        if DLL_loader.change_cwd("C:\\Tektronix\\RSA_API\\lib\\x86"):
             rsa = RSAInterface.__try_load_dll()
             if rsa is not None:
                 return rsa
@@ -77,6 +77,7 @@ class RSAInterface:
             print(DLL_loader.RSA_DLL_FILENAME)
             print(DLL_loader.FULL_DLL_PATH_x64)
             rsa = cdll.LoadLibrary("C:/Users/Mikey/Desktop/School/Capstone/tek17/RSA_API/lib/x64/RSA_API.dll")
+            rsa = cdll.LoadLibrary("RSA_API.dll")
             return rsa
         except OSError as e:
             print(e)
@@ -90,7 +91,7 @@ class RSAInterface:
     # Connects to the RSA
     # ################## RSA PDF GUIDE PAGE 6 ################## #
     @staticmethod
-    def search_connect(self):
+    def search_connect():
         # throws Not Connected error if the RSA is not initialized
         if RSAInterface.__rsa is None:
             raise RSAError(ReturnStatus.errorNotConnected.name)

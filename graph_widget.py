@@ -26,6 +26,7 @@ class Graph_Widget(FigureCanvas):
         ax = self.figure.get_axes()[0]
 
         ax.clear()
+        # ax.set_facecolor("white")
         ax.set_xlabel("Frequency")
         ax.set_ylabel("Amplitude")
 
@@ -53,6 +54,6 @@ class Graph_Widget(FigureCanvas):
         ax.set_yticklabels(y_ticklabels)
 
         # display bitmap from new_graph_data on graph
-        ax.imshow(new_graph_data.DPX_bitmap, cmap='gist_stern', aspect='auto')
+        ax.imshow(new_graph_data.bitmap, cmap='gist_stern', aspect='auto')
 
         self.draw()

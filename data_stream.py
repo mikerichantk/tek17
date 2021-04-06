@@ -102,10 +102,10 @@ class GraphDataStream:
     #   dpx_data <DPXGraphData>: the data to buffer
     def __add_to_buffer(self, data):
         # push the new data into the buffer
-        self.__data_buffer.insert(0, data)
+        self.__dpx_data_buffer.insert(0, data)
 
         # get rid of any data exceeding the buffer size
-        self.__data_buffer = self.__data_buffer[:self.__buffer_size]
+        self.__dpx_data_buffer = self.__dpx_data_buffer[:self.__buffer_size]
 
     # Parameters:
     #   count <int>: optionally specifies the number of data to return
@@ -115,9 +115,9 @@ class GraphDataStream:
     #   the DPXGraphData that was most recently returned by get_dpx_data
     def get_previous_dpx_data(self, count=None):
         if count == None:
-            return self.__data_buffer[0]
+            return self.__dpx_data_buffer[0]
 
-        return self.__data_buffer[0:count]
+        return self.__dpx_data_buffer[0:count]
 
     # Opens this stream
     def open(self):

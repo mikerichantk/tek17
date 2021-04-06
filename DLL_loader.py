@@ -15,10 +15,10 @@ ROOT_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 
 # Variables holding the paths of the DLL files
 REL_DLL_PATH_x64 = Path("RSA_API/lib/x64")
-REL_DLL_PATH_x84 = Path("RSA_API/lib/x86")
+REL_DLL_PATH_x86 = Path("RSA_API/lib/x86")
 RSA_DLL_FILENAME = "RSA_API.dll"
 FULL_DLL_PATH_x64 = str(ROOT_DIR) + "/" + str(REL_DLL_PATH_x64)
-FULL_DLL_PATH_x84 = str(ROOT_DIR) +  "/" + str(REL_DLL_PATH_x84)
+FULL_DLL_PATH_x86 = str(ROOT_DIR) +  "/" + str(REL_DLL_PATH_x86)
 
 
 

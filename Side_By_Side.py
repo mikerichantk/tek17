@@ -57,22 +57,22 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         self.setLayout(layout_container)
 
         # create buttons to interact
-        self.move_buttons = (QtWidgets.QPushButton("UP"),
-                             QtWidgets.QPushButton("DOWN"),
-                             QtWidgets.QPushButton("LEFT"),
-                             QtWidgets.QPushButton("RIGHT"))
+        self.__move_buttons = [QtWidgets.QPushButton("UP"),
+                               QtWidgets.QPushButton("DOWN"),
+                               QtWidgets.QPushButton("LEFT"),
+                               QtWidgets.QPushButton("RIGHT")]
 
-        self.zoom_buttons = (QtWidgets.QPushButton("Zoom In"),
-                             QtWidgets.QPushButton("Zoom Out"))
+        self.__zoom_buttons = [QtWidgets.QPushButton("Zoom In"),
+                               QtWidgets.QPushButton("Zoom Out")]
 
         # add the buttons to the layout
-        layout_container.addWidget(self.move_buttons[0], 1, 6, 1, 1)  # UP
-        layout_container.addWidget(self.move_buttons[1], 3, 6, 1, 1)  # DOWN
-        layout_container.addWidget(self.move_buttons[2], 2, 5, 1, 1)  # LEFT
-        layout_container.addWidget(self.move_buttons[3], 2, 7, 1, 1)  # RIGHT
+        layout_container.addWidget(self.__move_buttons[0], 1, 6, 1, 1)  # UP
+        layout_container.addWidget(self.__move_buttons[1], 3, 6, 1, 1)  # DOWN
+        layout_container.addWidget(self.__move_buttons[2], 2, 5, 1, 1)  # LEFT
+        layout_container.addWidget(self.__move_buttons[3], 2, 7, 1, 1)  # RIGHT
 
-        layout_container.addWidget(self.zoom_buttons[0], 2, 0, 1, 2)  # Zoom In
-        layout_container.addWidget(self.zoom_buttons[1], 2, 2, 1, 2)  # Zoom Out
+        layout_container.addWidget(self.__zoom_buttons[0], 2, 0, 1, 2)  # Zoom In
+        layout_container.addWidget(self.__zoom_buttons[1], 2, 2, 1, 2)  # Zoom Out
 
         layout_container.setRowStretch(0, 2)
         #layout_container.setColumnStretch(5, 2)
@@ -81,13 +81,24 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         layout_container.setColumnStretch(2, 2)
 
         # move_button_container.addChildLayout()
-        self.move_buttons[0].clicked.connect(self.click_up)
-        self.move_buttons[1].clicked.connect(self.click_down)
-        self.move_buttons[2].clicked.connect(self.click_left)
-        self.move_buttons[3].clicked.connect(self.click_right)
+        self.__move_buttons[0].clicked.connect(self.click_up)
+        self.__move_buttons[1].clicked.connect(self.click_down)
+        self.__move_buttons[2].clicked.connect(self.click_left)
+        self.__move_buttons[3].clicked.connect(self.click_right)
+        
+        ''''
+            For some reason, python didn't like iterating over a list of QPushButtons in a for loop?
+            If you can figure out how to do this let me know.
+            These next four lines makes it so you can press and hold the button down and repeatedly send move
+            commands to the arduino (to then move the motors).
+        '''
+        self.__move_buttons[0].setAutoRepeat(True)
+        self.__move_buttons[1].setAutoRepeat(True)
+        self.__move_buttons[2].setAutoRepeat(True)
+        self.__move_buttons[3].setAutoRepeat(True)
 
-        self.zoom_buttons[0].clicked.connect(self.click_zoom_in)
-        self.zoom_buttons[1].clicked.connect(self.click_zoom_out)
+        self.__zoom_buttons[0].clicked.connect(self.click_zoom_in)
+        self.__zoom_buttons[1].clicked.connect(self.click_zoom_out)
 
         # add graph widget
         self.graph_figure = plt.figure(1, figsize=(5, 10))
@@ -141,17 +152,24 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         p = convert_to_Qt_format.scaled(self.display_width, self.display_height, Qt.KeepAspectRatio)
         return QPixmap.fromImage(p)
 
+    # prints what button was pressed, then sends a move signal to the arduino
     def click_up(self):
         print("Up button was pressed.")
+        # uses PySerial to send serial signals to the Arduino, which was previously flashed with the code:
+        # "/arduino_mast_control/arduino_mast_control.ino"
+        arduinoData.write(b'w')
 
     def click_down(self):
         print("Down button was pressed.")
+        arduinoData.write(b's')
 
     def click_left(self):
         print("Left button was pressed.")
+        arduinoData.write(b'a')
 
     def click_right(self):
         print("Right button was pressed.")
+        arduinoData.write(b'd')
 
     def click_zoom_in(self):
         print("Zoom in button pressed.")

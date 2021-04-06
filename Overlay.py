@@ -93,6 +93,11 @@ class Overlay_Tab(QtWidgets.QWidget):
 
         # add graph widget
         self.graph_figure = plt.figure(1, figsize=(5, 10))
+        # add axis labels
+        ax = self.graph_figure.add_subplot(111)
+        ax.set_xlabel("Frequency", fontsize=30)
+        ax.set_ylabel("Amplitude", fontsize=30)
+        # make the graph
         self.graph_canvas = FigureCanvas(self.graph_figure)
         self.graph_widget = DrawGraph(self.graph_figure, self.graph_canvas)
 

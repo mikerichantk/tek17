@@ -75,7 +75,7 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         layout_container.addWidget(self.zoom_buttons[1], 2, 2, 1, 2)  # Zoom Out
 
         layout_container.setRowStretch(0, 2)
-
+        #layout_container.setColumnStretch(5, 2)
         layout_container.setColumnStretch(4, 2)
         layout_container.setColumnStretch(0, 2)
         layout_container.setColumnStretch(2, 2)
@@ -97,11 +97,7 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
 
         # add temporary box where video feed will go
         videoBox = QVBoxLayout()
-        videoFrame = QFrame(self)
-        videoFrame.setFrameShape(QFrame.StyledPanel)
-        videoFrame.setLineWidth(0.6)
-        videoFrame.setGeometry(1000, 100, 800, 600)
-        videoBox.addWidget(videoFrame)
+
         self.setLayout(videoBox)
 
         self.display_width = 640
@@ -117,6 +113,8 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         videoBox.addWidget(self.textLabel)
         # set the vbox layout as the widgets layout
         self.setLayout(videoBox)
+
+        layout_container.addWidget(self.image_label, 0, 4, 1, 3)
 
         # create the video capture thread
         self.thread = VideoThread()
@@ -172,7 +170,7 @@ class AppMainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Remote RF/Video Monitor")
 
         # sets the main widget to be the tab manager
-        self.main_widget = Side_By_Side()
+        self.main_widget = Side_By_Side_Tab()
         self.setCentralWidget(self.main_widget)
         self.setMinimumSize(1500, 1200)
         self.showMaximized()

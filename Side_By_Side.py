@@ -166,7 +166,7 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
 class AppMainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
-        # set the main container's layout
+        # set the main container's lay`out
         super(AppMainWindow, self).__init__()
         self.setWindowTitle("Remote RF/Video Monitor")
 

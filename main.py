@@ -1,5 +1,5 @@
 __author__ = "Addison Raak, Michael Antkiewicz, Ka'ulu Ng, Nicholas Baldwin"
-__copyright__ = "Copyright 2020, Tektronix Inc."
+__copyright__ = "Copyright 2017-19, Tektronix Inc."
 __credits__ = ["Addison Raak", "Michael Antkiewicz", "Ka'ulu Ng", "Nicholas Baldwin"]
 
 import sys
@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QApplication, QLab
 
 matplotlib.use('Qt5Agg')
 
-from graph_widget import DrawGraph
+from gui_graph_widget import GraphWidget
 
 from numpy import arange, sin, pi
 from PyQt5 import QtWidgets, QtCore
@@ -21,8 +21,14 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+
 from Side_By_Side import Side_By_Side_Tab
 from Overlay import Overlay_Tab
+import serial
+
+# change this port number based on the machine you are using
+# will need to get changed if the USB port changes
+arduinoData = serial.Serial("/dev/cu.usbmodem145401", 9600)
 
 # Class for the main widget of the program, which will have the tab manager
 class TabManager(QtWidgets.QWidget):

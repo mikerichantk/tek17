@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QApplication, QLab
 
 matplotlib.use('Qt5Agg')
 
-from graph_widget import DrawGraph
+from gui_graph_widget import GraphWidget
 
 from numpy import arange, sin, pi
 from PyQt5 import QtWidgets, QtCore
@@ -21,7 +21,8 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
-
+import serial
+#arduinoData = serial.Serial("COM6", 9600)
 
 # code sourced from https://gist.github.com/docPhil99/ca4da12c9d6f29b9cea137b617c7b8b1
 class VideoThread(QThread):
@@ -103,7 +104,7 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         # add graph widget
         self.graph_figure = plt.figure(1, figsize=(5, 10))
         self.graph_canvas = FigureCanvas(self.graph_figure)
-        self.graph_widget = DrawGraph(self.graph_figure, self.graph_canvas)
+        self.graph_widget = GraphWidget(self.graph_figure, self.graph_canvas)
         layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
 
         # add temporary box where video feed will go
@@ -157,19 +158,19 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         print("Up button was pressed.")
         # uses PySerial to send serial signals to the Arduino, which was previously flashed with the code:
         # "/arduino_mast_control/arduino_mast_control.ino"
-        arduinoData.write(b'w')
+        #arduinoData.write(b'w')
 
     def click_down(self):
         print("Down button was pressed.")
-        arduinoData.write(b's')
+        #arduinoData.write(b's')
 
     def click_left(self):
         print("Left button was pressed.")
-        arduinoData.write(b'a')
+        #arduinoData.write(b'a')
 
     def click_right(self):
         print("Right button was pressed.")
-        arduinoData.write(b'd')
+        #arduinoData.write(b'd')
 
     def click_zoom_in(self):
         print("Zoom in button pressed.")

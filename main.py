@@ -28,7 +28,7 @@ import serial
 
 # change this port number based on the machine you are using
 # will need to get changed if the USB port changes
-arduinoData = serial.Serial("/dev/cu.usbmodem145401", 9600)
+#arduinoData = serial.Serial("/dev/cu.usbmodem145401", 9600)
 
 # Class for the main widget of the program, which will have the tab manager
 class TabManager(QtWidgets.QWidget):

@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QApplication, QLab
 
 matplotlib.use('Qt5Agg')
 
-from graph_widget import DrawGraph
+from gui_graph_widget import GraphWidget
 
 from numpy import arange, sin, pi
 from PyQt5 import QtWidgets, QtCore
@@ -99,7 +99,7 @@ class Overlay_Tab(QtWidgets.QWidget):
         ax.set_ylabel("Amplitude", fontsize=30)
         # make the graph
         self.graph_canvas = FigureCanvas(self.graph_figure)
-        self.graph_widget = DrawGraph(self.graph_figure, self.graph_canvas)
+        self.graph_widget = GraphWidget(self.graph_figure, self.graph_canvas)
 
         layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
 

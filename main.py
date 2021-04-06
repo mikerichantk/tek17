@@ -23,7 +23,7 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from Side_By_Side import Side_By_Side_Tab
 from Overlay import Overlay_Tab
-from testVid import App
+#from testVid import App
 
 
 # Class for the main widget of the program, which will have the tab manager
@@ -40,12 +40,12 @@ class TabManager(QtWidgets.QWidget):
 
         self.side_tab = Side_By_Side_Tab()
         self.overlay_tab = Overlay_Tab()
-        self.app = App()
+        #self.app = App()
 
         # make the two tabs needed (overlay and sidebyside)
         tab_controller.addTab(self.overlay_tab, "Overlay")
         tab_controller.addTab(self.side_tab, "Side by Side")
-        tab_controller.addTab(self.app, "App")
+        #tab_controller.addTab(self.app, "App")
 
         tab_container.addWidget(tab_controller)
 

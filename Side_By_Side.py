@@ -33,7 +33,8 @@ class VideoThread(QThread):
 
     def run(self):
         # capture from web cam
-        cap = cv2.VideoCapture("rtsp://169.254.161.100:554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream")
+        #camera address: "rtsp://169.254.161.100:554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream"
+        cap = cv2.VideoCapture(0)
         while self._run_flag:
             ret, cv_img = cap.read()
             if ret:
@@ -166,7 +167,7 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
 class AppMainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
-        # set the main container's lay`out
+        # set the main container's layout
         super(AppMainWindow, self).__init__()
         self.setWindowTitle("Remote RF/Video Monitor")
 

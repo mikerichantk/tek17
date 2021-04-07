@@ -7,7 +7,6 @@ import numpy as np
 import DLL_loader
 from rsa_config import RSAConfig
 from RSA_API import *
-from ctypes import *
 
 
 class RSAInterface:
@@ -41,23 +40,10 @@ class RSAInterface:
         if RSAInterface.__rsa is None:
             # change the directory so the dll file will work
             current_dir = os.getcwd()
-            RSAInterface.__rsa = RSAInterface.__try_init_RSA_Interface()
+            RSAInterface.__rsa = RSAInterface.init_RSA_interface(self)
             os.chdir(current_dir)
 
     # Loads the RSA_API.dll file if it exists
-    # @staticmethod
-    # def __try_init_RSA_interface():
-    #     if DLL_loader.change_cwd(DLL_loader.RSA_DLL_PATH_x64):
-    #         rsa = cdll.LoadLibrary(DLL_loader.RSA_DLL_FILENAME)
-    #         if rsa is not None:
-    #             return rsa
-    #     elif DLL_loader.change_cwd(DLL_loader.RSA_DLL_PATH_x84):
-    #         rsa = cdll.LoadLibrary(DLL_loader.RSA_DLL_FILENAME)
-    #         if rsa is not None:
-    #             return rsa
-    #     return None
-
-    # This method tries to load the dll file in order to initialize an rsa interface object, called rsa.
     @staticmethod
     def __try_init_RSA_Interface():
         if DLL_loader.change_cwd(DLL_loader.FULL_DLL_PATH_x64):

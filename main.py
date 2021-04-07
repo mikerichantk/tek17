@@ -4,24 +4,29 @@ __credits__ = ["Addison Raak", "Michael Antkiewicz", "Ka'ulu Ng", "Nicholas Bald
 
 import sys
 import os
-import random
-
 import numpy as np
 import matplotlib
-import serial
+import cv2
+from PyQt5 import Qt, QtGui
+from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QApplication, QLabel
+
 matplotlib.use('Qt5Agg')
 
 from gui_graph_widget import GraphWidget
 
 from numpy import arange, sin, pi
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from data_stream import *
 from graph_widget import *
 import matplotlib.pyplot as plt
-from threading import Thread
+
+from Side_By_Side import Side_By_Side_Tab
+from Overlay import Overlay_Tab
+import serial
 
 # change this port number based on the machine you are using
 # will need to get changed if the USB port changes
@@ -40,9 +45,12 @@ class TabManager(QtWidgets.QWidget):
         # create the tab widget itself
         tab_controller = QtWidgets.QTabWidget()
 
+        self.side_tab = Side_By_Side_Tab()
+        self.overlay_tab = Overlay_Tab()
+
         # make the two tabs needed (overlay and sidebyside)
-        tab_controller.addTab(OverlayWidget(), "Overlay")
-        tab_controller.addTab(SideBySideWidget(), "Side by Side")
+        tab_controller.addTab(self.overlay_tab, "Overlay")
+        tab_controller.addTab(self.side_tab, "Side by Side")
 
         tab_container.addWidget(tab_controller)
 

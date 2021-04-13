@@ -78,6 +78,63 @@ class AppMainWindow(QtWidgets.QMainWindow):
 
 # runs the application
 if __name__ == "__main__":
+
+    # -------------------------------------------------------------------------------
+    # Test of Python and Quatanium Python-ONVIF with NETCAT camera PT-PTZ2087
+    # ONVIF Client implementation is in Python
+    # For IP control of PTZ, the camera should be compliant with ONVIF Profile S
+    # The PTZ2087 reports it is ONVIF 2.04 but is actually 2.4 (Netcat said text not changed after upgrade)
+    # ------------------------------------------------------------------------------
+
+    if __name__ == '__main__':
+        # Do all setup initializations
+        import ptzcam
+
+        ptz = ptzcam.ptzcam()
+
+        # *****************************************************************************
+        # IP camera motion tests
+        # *****************************************************************************
+        print
+        'Starting tests...'
+
+        # Set preset
+        ptz.move_pan(1.0, 1)  # move to a new home position
+        ptz.set_preset('home')
+
+        # move right -- (velocity, duration of move)
+        ptz.move_pan(1.0, 2)
+
+        # move left
+        ptz.move_pan(-1.0, 2)
+
+        # move down
+        ptz.move_tilt(-1.0, 2)
+
+        # Move up
+        ptz.move_tilt(1.0, 2)
+
+        # zoom in
+        ptz.zoom(8.0, 2)
+
+        # zoom out
+        ptz.zoom(-8.0, 2)
+
+        # Absolute pan-tilt (pan position, tilt position, velocity)
+        # DOES NOT RESULT IN CAMERA MOVEMENT
+        ptz.move_abspantilt(-1.0, 1.0, 1.0)
+        ptz.move_abspantilt(1.0, -1.0, 1.0)
+
+        # Relative move (pan increment, tilt increment, velocity)
+        # DOES NOT RESULT IN CAMERA MOVEMENT
+        ptz.move_relative(0.5, 0.5, 8.0)
+
+        # Get presets
+        ptz.get_preset()
+        # Go back to preset
+        ptz.goto_preset('home')
+
+
     app = QtWidgets.QApplication(sys.argv)
     # runs AppMainWindow class as main container
     main_window = AppMainWindow()

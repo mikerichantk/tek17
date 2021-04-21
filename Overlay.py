@@ -15,8 +15,11 @@ from numpy import arange, sin, pi
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from threading import Thread
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+from data_stream import *
+from graph_widget import *
 
 
 # code sourced from https://gist.github.com/docPhil99/ca4da12c9d6f29b9cea137b617c7b8b1
@@ -101,7 +104,28 @@ class Overlay_Tab(QtWidgets.QWidget):
         self.graph_canvas = FigureCanvas(self.graph_figure)
         self.graph_widget = GraphWidget(self.graph_figure, self.graph_canvas)
 
-        layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
+        # start the stream
+        self.stream = create_data_stream()
+        self.live_stream_graph = Graph_Widget()
+
+        layout_container.addWidget(self.live_stream_graph, 0, 0, 1, 3)
+
+        thread = Thread(target=self.update_live_widget)
+        thread.start()
+
+    # layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
+    # thread target function
+    # Opens dpx data stream and grabs frame from RSA while the stream remains open
+    def update_live_widget(self):
+        try:
+            self.stream.open()
+        except (RSAError, ValueError) as err:
+            self.popup.show_popup("Could not connect to RSA", str(err))
+            return
+
+        for data in self.stream.get_dpx_data_while_open():
+            self.live_stream_graph.update_graph(data)
+
 
     def click_up(self):
         print("Up button was pressed.")

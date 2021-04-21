@@ -4,12 +4,12 @@ __credits__ = ["Addison Raak", "Michael Antkiewicz", "Ka'ulu Ng", "Nicholas Bald
 
 
 import matplotlib
+import serial
 matplotlib.use('Qt5Agg')
 
 from PyQt5 import QtWidgets
 from data_stream import *
 from graph_widget import *
-from threading import Thread
 from Side_By_Side import Side_By_Side_Tab
 from Overlay import Overlay_Tab
 

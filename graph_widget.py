@@ -4,7 +4,7 @@ __credits__ = ["Addison Raak", "Michael Antkiewicz", "Ka'ulu Ng", "Nicholas Bald
 
 import numpy as np
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 
 # This class represents the widget graphing dpx bitmap
@@ -26,6 +26,7 @@ class Graph_Widget(FigureCanvas):
         ax = self.figure.get_axes()[0]
 
         ax.clear()
+        # ax.set_facecolor("white")
         ax.set_xlabel("Frequency")
         ax.set_ylabel("Amplitude")
 
@@ -53,6 +54,6 @@ class Graph_Widget(FigureCanvas):
         ax.set_yticklabels(y_ticklabels)
 
         # display bitmap from new_graph_data on graph
-        ax.imshow(new_graph_data.DPX_bitmap, cmap='gist_stern', aspect='auto')
+        ax.imshow(new_graph_data.bitmap, cmap='gist_stern', aspect='auto')
 
         self.draw()

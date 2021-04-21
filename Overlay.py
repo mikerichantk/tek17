@@ -125,8 +125,6 @@ class Overlay_Tab(QtWidgets.QWidget):
         print(e.key())
 
 
-
-
 # Main class for adding components to the application
 # used for formatting as well
 class AppMainWindow(QtWidgets.QMainWindow):

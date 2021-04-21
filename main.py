@@ -2,33 +2,21 @@ __author__ = "Addison Raak, Michael Antkiewicz, Ka'ulu Ng, Nicholas Baldwin"
 __copyright__ = "Copyright 2017-19, Tektronix Inc."
 __credits__ = ["Addison Raak", "Michael Antkiewicz", "Ka'ulu Ng", "Nicholas Baldwin"]
 
-import sys
-import os
-import numpy as np
-import matplotlib
-import cv2
-from PyQt5 import Qt, QtGui
-from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QApplication, QLabel
 
+import matplotlib
 matplotlib.use('Qt5Agg')
 
-from gui_graph_widget import GraphWidget
-
-from numpy import arange, sin, pi
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-
+from PyQt5 import QtWidgets
+from data_stream import *
+from graph_widget import *
+from threading import Thread
 from Side_By_Side import Side_By_Side_Tab
 from Overlay import Overlay_Tab
-import serial
 
 # change this port number based on the machine you are using
 # will need to get changed if the USB port changes
 #arduinoData = serial.Serial("/dev/cu.usbmodem145401", 9600)
+
 
 # Class for the main widget of the program, which will have the tab manager
 class TabManager(QtWidgets.QWidget):
@@ -54,7 +42,6 @@ class TabManager(QtWidgets.QWidget):
     def on_close(self):
         # Method inherited from QWidget to close the window
         self.on_close()
-
 
 # Main class for adding components to the application
 # used for formatting as well

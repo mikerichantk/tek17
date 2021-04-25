@@ -105,15 +105,14 @@ class Overlay_Tab(QtWidgets.QWidget):
         self.graph_widget = GraphWidget(self.graph_figure, self.graph_canvas)
 
         # start the stream
-        self.stream = create_data_stream()
-        self.live_stream_graph = Graph_Widget()
+        # self.stream = create_data_stream()
+        # self.live_stream_graph = Graph_Widget()
+        #
+        # layout_container.addWidget(self.live_stream_graph, 0, 0, 1, 3)
+        #
+        # thread = Thread(target=self.update_live_widget)
+        # thread.start()
 
-        layout_container.addWidget(self.live_stream_graph, 0, 0, 1, 3)
-
-        thread = Thread(target=self.update_live_widget)
-        thread.start()
-
-    # layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
     # thread target function
     # Opens dpx data stream and grabs frame from RSA while the stream remains open
     def update_live_widget(self):

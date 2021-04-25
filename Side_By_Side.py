@@ -11,6 +11,10 @@ from PyQt5 import Qt, QtGui
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QApplication, QLabel
 
+from data_stream import *
+from graph_widget import *
+from threading import Thread
+
 matplotlib.use('Qt5Agg')
 
 from gui_graph_widget import GraphWidget
@@ -22,7 +26,10 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import serial
-#arduinoData = serial.Serial("COM6", 9600)
+
+# change this port number based on the machine you are using
+# will need to get changed if the USB port changes
+arduinoData = serial.Serial("COM4", 9600)
 
 # code sourced from https://gist.github.com/docPhil99/ca4da12c9d6f29b9cea137b617c7b8b1
 class VideoThread(QThread):
@@ -35,7 +42,7 @@ class VideoThread(QThread):
     def run(self):
         # capture from web cam
         #camera address: "rtsp://169.254.161.100:554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream"
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture("rtsp://169.254.161.100:554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream")
         while self._run_flag:
             ret, cv_img = cap.read()
             if ret:
@@ -76,7 +83,7 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         layout_container.addWidget(self.__zoom_buttons[1], 2, 2, 1, 2)  # Zoom Out
 
         layout_container.setRowStretch(0, 2)
-        #layout_container.setColumnStretch(5, 2)
+        layout_container.setRowStretch(1, 2)
         layout_container.setColumnStretch(4, 2)
         layout_container.setColumnStretch(0, 2)
         layout_container.setColumnStretch(2, 2)
@@ -122,18 +129,38 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         ###sourced from https://gist.github.com/docPhil99/ca4da12c9d6f29b9cea137b617c7b8b1###
         # create a vertical box layout and add the two labels
         videoBox.addWidget(self.image_label)
-        videoBox.addWidget(self.textLabel)
         # set the vbox layout as the widgets layout
         self.setLayout(videoBox)
 
-        layout_container.addWidget(self.image_label, 0, 4, 1, 3)
+        layout_container.addWidget(self.image_label, 0, 3, 1, 3)
 
         # create the video capture thread
         self.thread = VideoThread()
-
         self.thread.change_pixmap_signal.connect(self.update_image)
 
         self.thread.start()
+
+        # start the stream
+        self.stream = create_data_stream()
+        self.live_stream_graph = Graph_Widget()
+
+        layout_container.addWidget(self.live_stream_graph, 0, 0, 1, 3)
+
+        thread = Thread(target=self.update_live_widget)
+        thread.start()
+
+        # thread target function
+        # Opens dpx data stream and grabs frame from RSA while the stream remains open
+
+    def update_live_widget(self):
+        try:
+            self.stream.open()
+        except (RSAError, ValueError) as err:
+            self.popup.show_popup("Could not connect to RSA", str(err))
+            return
+
+        for data in self.stream.get_dpx_data_while_open():
+            self.live_stream_graph.update_graph(data)
 
     def closeEvent(self, event):
         self.thread.stop()
@@ -144,6 +171,7 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         qt_img = self.convert_cv_qt(cv_img)
         self.image_label.setPixmap(qt_img)
 
+
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
         rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
@@ -151,32 +179,39 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         bytes_per_line = ch * w
         convert_to_Qt_format = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
         p = convert_to_Qt_format.scaled(self.display_width, self.display_height, Qt.KeepAspectRatio)
-        return QPixmap.fromImage(p)
+        p.setDevicePixelRatio(0.85) # makes feed roughly the same size as graph
+        qimg = QPixmap.fromImage(p)
+        self._displayed_pixmap = QtGui.QPixmap(qimg)
+        self._displayed_pixmap.scaled(self.width(), self.height(), QtCore.Qt.KeepAspectRatio)
+        #self.setScaledContents(True)
+        return qimg
 
     # prints what button was pressed, then sends a move signal to the arduino
     def click_up(self):
         print("Up button was pressed.")
         # uses PySerial to send serial signals to the Arduino, which was previously flashed with the code:
         # "/arduino_mast_control/arduino_mast_control.ino"
-        #arduinoData.write(b'w')
+        arduinoData.write(b's')
 
     def click_down(self):
         print("Down button was pressed.")
-        #arduinoData.write(b's')
+        arduinoData.write(b'w')
 
     def click_left(self):
         print("Left button was pressed.")
-        #arduinoData.write(b'a')
+        arduinoData.write(b'a')
 
     def click_right(self):
         print("Right button was pressed.")
-        #arduinoData.write(b'd')
+        arduinoData.write(b'd')
 
     def click_zoom_in(self):
         print("Zoom in button pressed.")
+        self.image_label.resize((self.image_label.width() * 1.2), (self.image_label.height() * 1.2))
 
     def click_zoom_out(self):
         print("Zoom out button pressed.")
+        #self.image_label.resize((self.image_label.width() * 0.8), (self.image_label.height() * 0.8))
 
 
 # Main class for adding components to the application

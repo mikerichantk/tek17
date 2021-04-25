@@ -15,7 +15,7 @@ from Overlay import Overlay_Tab
 
 # change this port number based on the machine you are using
 # will need to get changed if the USB port changes
-#arduinoData = serial.Serial("/dev/cu.usbmodem145401", 9600)
+# arduinoData = serial.Serial("/dev/cu.usbmodem145401", 9600)
 
 
 # Class for the main widget of the program, which will have the tab manager
@@ -34,8 +34,8 @@ class TabManager(QtWidgets.QWidget):
         self.overlay_tab = Overlay_Tab()
 
         # make the two tabs needed (overlay and sidebyside)
-        tab_controller.addTab(self.overlay_tab, "Overlay")
         tab_controller.addTab(self.side_tab, "Side by Side")
+        tab_controller.addTab(self.overlay_tab, "Overlay")
 
         tab_container.addWidget(tab_controller)
 

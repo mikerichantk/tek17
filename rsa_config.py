@@ -9,7 +9,7 @@ from RSA_API import *
 # it holds all necessary configurations to configure an RSA
 # these types are stored as ctypes in order to easily interface with the RSA API
 class RSAConfig:
-    def __init__(self, cf=5e9, refLevel=0, refLevelOffset=100, span=40e6, rbw=None, persistence=1.0):
+    def __init__(self, cf=2.412e9, refLevel=-40, refLevelOffset=100, span=40e6, rbw=None, persistence=1.0):
         if rbw is None:
             rbw = span/100
 
@@ -20,7 +20,7 @@ class RSAConfig:
         self.yUnit = VerticalUnitType.VerticalUnit_dBm
         self.yTop = c_double(refLevel)
         self.yBottom = c_double(refLevel - refLevelOffset)
-        self.infinitePersistence = c_bool(False)
+        self.infinitePersistence = c_bool(True)
         self.persistenceTimeSec = c_double(persistence)
         self.showOnlyTrigFrame = c_bool(False)
 

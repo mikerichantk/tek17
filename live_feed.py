@@ -1,11 +1,9 @@
-import sys
-from pathlib import Path
-import time
-from threading import Thread
-import datetime as dt
-from PyQt5 import QtWidgets, QtCore
+__author__ = "Addison Raak, Michael Antkiewicz, Ka'ulu Ng, Nicholas Baldwin"
+__copyright__ = "Copyright 2017-19, Tektronix Inc."
+__credits__ = ["Addison Raak", "Michael Antkiewicz", "Ka'ulu Ng", "Nicholas Baldwin"]
 
-from RSA_API import RSAError
+from threading import Thread
+from PyQt5 import QtWidgets, QtCore
 from data_stream import *
 import popup as pw
 

@@ -26,7 +26,6 @@ class Graph_Widget(FigureCanvas):
         ax = self.figure.get_axes()[0]
 
         ax.clear()
-        # ax.set_facecolor("white")
         ax.set_xlabel("Frequency")
         ax.set_ylabel("Amplitude")
 

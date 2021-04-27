@@ -44,19 +44,6 @@ class RSAInterface:
             RSAInterface.__rsa = RSAInterface.__try_init_RSA_Interface()
             os.chdir(current_dir)
 
-    # Loads the RSA_API.dll file if it exists
-    # @staticmethod
-    # def __try_init_RSA_interface():
-    #     if DLL_loader.change_cwd(DLL_loader.RSA_DLL_PATH_x64):
-    #         rsa = cdll.LoadLibrary(DLL_loader.RSA_DLL_FILENAME)
-    #         if rsa is not None:
-    #             return rsa
-    #     elif DLL_loader.change_cwd(DLL_loader.RSA_DLL_PATH_x84):
-    #         rsa = cdll.LoadLibrary(DLL_loader.RSA_DLL_FILENAME)
-    #         if rsa is not None:
-    #             return rsa
-    #     return None
-
     # This method tries to load the dll file in order to initialize an rsa interface object, called rsa.
     @staticmethod
     def __try_init_RSA_Interface():
@@ -103,7 +90,6 @@ class RSAInterface:
         # numFound used later to hold number of available RSA's that connected
         # page 6 of pdf
         numFound = c_int(0)
-        # intArray = c_int * DEVSRCH_MAX_NUM_DEVICES
         intArray = c_int * 10
         deviceIDs = intArray()
         deviceSerial = create_string_buffer(DEVSRCH_SERIAL_MAX_STRLEN)
@@ -112,9 +98,6 @@ class RSAInterface:
 
         RSAInterface.__rsa.DEVICE_GetAPIVersion(apiVersion)
         print('API Version {}'.format(apiVersion.value.decode()))
-
-        # self.err_check(RSAInterface.__rsa.DEVICE_Search(byref(numFound), deviceIDs,
-        #                                                 deviceSerial, deviceType))
 
         RSAInterface.__rsa.DEVICE_Search(byref(numFound), deviceIDs, deviceSerial, deviceType)
         # Checks to see how many RSA's are connected. Currently only supports 1.
@@ -280,10 +263,6 @@ class RSAInterface:
         for i in range(3):
             traces.append(10 * np.log10(1000 * np.array(
                 fb.spectrumTraces[i][:fb.spectrumTraceLength])) + 30)
-        # specTrace2 = 10 * np.log10(1000*np.array(
-        #     fb.spectrumTraces[1][:fb.spectrumTraceLength])) + 30
-        # specTrace3 = 10 * np.log10(1000*np.array(
-        #     fb.spectrumTraces[2][:fb.spectrumTraceLength])) + 30
 
         # return dpxBitmap, specTrace1, specTrace2, specTrace3
         return dpxBitmap, traces

@@ -1,3 +1,7 @@
+__author__ = "Addison Raak, Michael Antkiewicz, Ka'ulu Ng, Nicholas Baldwin"
+__copyright__ = "Copyright 2017-19, Tektronix Inc."
+__credits__ = ["Addison Raak", "Michael Antkiewicz", "Ka'ulu Ng", "Nicholas Baldwin"]
+
 import sys
 import os
 import numpy as np
@@ -94,37 +98,37 @@ class Overlay_Tab(QtWidgets.QWidget):
         self.zoom_buttons[0].clicked.connect(self.click_zoom_in)
         self.zoom_buttons[1].clicked.connect(self.click_zoom_out)
 
-        # add graph widget
-        self.graph_figure = plt.figure(1, figsize=(5, 10))
-        # add axis labels
-        ax = self.graph_figure.add_subplot(111)
-        ax.set_xlabel("Frequency", fontsize=30)
-        ax.set_ylabel("Amplitude", fontsize=30)
-        # make the graph
-        self.graph_canvas = FigureCanvas(self.graph_figure)
-        self.graph_widget = GraphWidget(self.graph_figure, self.graph_canvas)
-
-        # start the stream
-        self.stream = create_data_stream()
-        self.live_stream_graph = Graph_Widget()
-
-        layout_container.addWidget(self.live_stream_graph, 0, 0, 1, 3)
-
-        thread = Thread(target=self.update_live_widget)
-        thread.start()
-
-    # layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
-    # thread target function
-    # Opens dpx data stream and grabs frame from RSA while the stream remains open
-    def update_live_widget(self):
-        try:
-            self.stream.open()
-        except (RSAError, ValueError) as err:
-            self.popup.show_popup("Could not connect to RSA", str(err))
-            return
-
-        for data in self.stream.get_dpx_data_while_open():
-            self.live_stream_graph.update_graph(data)
+    #     # add graph widget
+    #     self.graph_figure = plt.figure(1, figsize=(5, 10))
+    #     # add axis labels
+    #     ax = self.graph_figure.add_subplot(111)
+    #     ax.set_xlabel("Frequency", fontsize=30)
+    #     ax.set_ylabel("Amplitude", fontsize=30)
+    #     # make the graph
+    #     self.graph_canvas = FigureCanvas(self.graph_figure)
+    #     self.graph_widget = GraphWidget(self.graph_figure, self.graph_canvas)
+    #
+    #     # start the stream
+    #     self.stream = create_data_stream()
+    #     self.live_stream_graph = Graph_Widget()
+    #
+    #     layout_container.addWidget(self.live_stream_graph, 0, 0, 1, 3)
+    #
+    #     thread = Thread(target=self.update_live_widget)
+    #     thread.start()
+    #
+    # # layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
+    # # thread target function
+    # # Opens dpx data stream and grabs frame from RSA while the stream remains open
+    # def update_live_widget(self):
+    #     try:
+    #         self.stream.open()
+    #     except (RSAError, ValueError) as err:
+    #         self.popup.show_popup("Could not connect to RSA", str(err))
+    #         return
+    #
+    #     for data in self.stream.get_dpx_data_while_open():
+    #         self.live_stream_graph.update_graph(data)
 
 
     def click_up(self):

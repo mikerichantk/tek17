@@ -1,10 +1,7 @@
-import sys
-import csv
-from pathlib import Path
+__author__ = "Addison Raak, Michael Antkiewicz, Ka'ulu Ng, Nicholas Baldwin"
+__copyright__ = "Copyright 2017-19, Tektronix Inc."
+__credits__ = ["Addison Raak", "Michael Antkiewicz", "Ka'ulu Ng", "Nicholas Baldwin"]
 
-import sys
-import os
-import numpy as np
 import matplotlib
 import cv2
 from PyQt5 import Qt, QtGui
@@ -14,15 +11,14 @@ from PyQt5.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QApplication, QLab
 matplotlib.use('Qt5Agg')
 
 from gui_graph_widget import GraphWidget
-
-from numpy import arange, sin, pi
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import serial
-#arduinoData = serial.Serial("COM6", 9600)
+from data_stream import *
+from graph_widget import *
+from threading import Thread
+arduinoData = serial.Serial("COM6", 9600)
 
 # code sourced from https://gist.github.com/docPhil99/ca4da12c9d6f29b9cea137b617c7b8b1
 class VideoThread(QThread):
@@ -34,8 +30,9 @@ class VideoThread(QThread):
 
     def run(self):
         # capture from web cam
-        #camera address: "rtsp://169.254.161.100:554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream"
-        cap = cv2.VideoCapture(0)
+        # camera address: "rtsp://169.254.161.100:554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream"
+        # use 0 if you want to test with laptop camera
+        cap = cv2.VideoCapture("rtsp://169.254.161.100:554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream")
         while self._run_flag:
             ret, cv_img = cap.read()
             if ret:
@@ -76,7 +73,6 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         layout_container.addWidget(self.__zoom_buttons[1], 2, 2, 1, 2)  # Zoom Out
 
         layout_container.setRowStretch(0, 2)
-        #layout_container.setColumnStretch(5, 2)
         layout_container.setColumnStretch(4, 2)
         layout_container.setColumnStretch(0, 2)
         layout_container.setColumnStretch(2, 2)
@@ -103,41 +99,39 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
 
         # add graph widget
         self.graph_figure = plt.figure(1, figsize=(5, 10))
+        # add axis labels
+        ax = self.graph_figure.add_subplot(111)
+        ax.set_xlabel("Frequency", fontsize=30)
+        ax.set_ylabel("Amplitude", fontsize=30)
+        # make the graph
         self.graph_canvas = FigureCanvas(self.graph_figure)
         self.graph_widget = GraphWidget(self.graph_figure, self.graph_canvas)
-        layout_container.addWidget(self.graph_widget.graph_canvas, 0, 0, 1, 3)
 
-        # add temporary box where video feed will go
-        videoBox = QVBoxLayout()
+        # start the stream
+        self.stream = create_data_stream()
+        self.live_stream_graph = Graph_Widget()
 
-        self.setLayout(videoBox)
+        layout_container.addWidget(self.live_stream_graph, 0, 0, 1, 3)
 
-        self.display_width = 640
-        self.display_height = 480
-        self.image_label = QLabel(self)
-        self.image_label.resize(self.display_width, self.display_height)
-        # create a text label
-        self.textLabel = QLabel('Webcam')
+        thread = Thread(target=self.update_live_widget)
+        thread.start()
 
-        ###sourced from https://gist.github.com/docPhil99/ca4da12c9d6f29b9cea137b617c7b8b1###
-        # create a vertical box layout and add the two labels
-        videoBox.addWidget(self.image_label)
-        videoBox.addWidget(self.textLabel)
-        # set the vbox layout as the widgets layout
-        self.setLayout(videoBox)
+        # thread target function
+        # Opens dpx data stream and grabs frame from RSA while the stream remains open
 
-        layout_container.addWidget(self.image_label, 0, 4, 1, 3)
+    def update_live_widget(self):
+        try:
+            self.stream.open()
+        except (RSAError, ValueError) as err:
+            self.popup.show_popup("Could not connect to RSA", str(err))
+            return
 
-        # create the video capture thread
-        self.thread = VideoThread()
-
-        self.thread.change_pixmap_signal.connect(self.update_image)
-
-        self.thread.start()
+        for data in self.stream.get_dpx_data_while_open():
+            self.live_stream_graph.update_graph(data)
 
     def closeEvent(self, event):
-        self.thread.stop()
-        event.accept()
+            self.thread.stop()
+            event.accept()
 
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
@@ -158,19 +152,19 @@ class Side_By_Side_Tab(QtWidgets.QWidget):
         print("Up button was pressed.")
         # uses PySerial to send serial signals to the Arduino, which was previously flashed with the code:
         # "/arduino_mast_control/arduino_mast_control.ino"
-        #arduinoData.write(b'w')
+        arduinoData.write(b'w')
 
     def click_down(self):
         print("Down button was pressed.")
-        #arduinoData.write(b's')
+        arduinoData.write(b's')
 
     def click_left(self):
         print("Left button was pressed.")
-        #arduinoData.write(b'a')
+        arduinoData.write(b'a')
 
     def click_right(self):
         print("Right button was pressed.")
-        #arduinoData.write(b'd')
+        arduinoData.write(b'd')
 
     def click_zoom_in(self):
         print("Zoom in button pressed.")
